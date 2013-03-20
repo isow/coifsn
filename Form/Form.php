@@ -25,6 +25,12 @@ class Form {
     public $htmlFooter = "";
     public $formFields;
 
+    function camelize($value, $lcfirst = true) {
+        $value = preg_replace("/([_-\s]?([a-z0-9]+))/e", "ucwords('\\2')", $value);
+        return ($lcfirst ? strtolower($value[0]) : strtoupper($value[0]))
+                . substr($value, 1);
+    }
+    
     function __construct($type = "create", $name = null, $method=null, $action=null, $onsubmit = null, $idArray = null) {
         if ($name != null)
             $this->formName = $name;
@@ -49,7 +55,7 @@ class Form {
         else
             $this->formOnSubmit = "";
 
-        $this->htmlHeader = "<form name='" . $this->formName . "' action='" . $this->formAction . "' onsubmit='" . $this->formOnSubmit . "' method='" . $this->formMethod . "' class='form-horizontal' acceptcharset='' enctype='application/x-www-form-urlencoded'>";
+        $this->htmlHeader = "<form name='" . $this->formName . "' action='" . $this->formAction . "' onsubmit='" . $this->formOnSubmit . "' method='" . $this->formMethod . "' class='form-horizontal' acceptcharset='' enctype='multipart/form-data'>";
         $this->htmlHeader .= "<table cellpadding=3 cellspacing=3>";
 
         $this->htmlContent = "";
@@ -187,7 +193,7 @@ class Form {
                 $this->htmlContent .= "</td>";
                 $this->htmlContent .= "<td class='form_td_field'>";
                         $this->htmlContent .= "<div class='controls'>";
-                            $this->htmlContent .= "<input type='checkbox' name='" . $name . "' value='1'";
+                            $this->htmlContent .= "<input type='checkbox' name='" . $name . "' value=1";
                                 if ($value == 1 || $value == true)
                                         $this->htmlContent .= " checked='checked'";
                                 $this->htmlContent .= " />";
@@ -209,5 +215,53 @@ class Form {
 
         return $this->htmlHeader . $this->htmlContent . $this->htmlFooter;
     }
+    
+    
+    
+    public function fileTreatment($globalFileValues,$fieldName, $filePath) {
+        if($globalFileValues[$fieldName]['name'] != "") {
+                $fichier = $globalFileValues[$fieldName]['name'];
+                move_uploaded_file($globalFileValues[$fieldName]['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $filePath . $fichier);
+                chmod($_SERVER['DOCUMENT_ROOT'] . $filePath . $fichier, 0777);
+                
+                return $fichier;
+        } else return '';
+    }
+    public function save($formFields, $postValues, $fileValues, $dao, $obj, $filePath) {
+        
+        foreach ($this->formFields as $oneFormField) {
+            switch($oneFormField['type']) {
+                case 'file':
+                    $values = $fileValues;
+                    $file_value = $this->fileTreatment($fileValues,$oneFormField['name'], $filePath);
+                    $values[$oneFormField['name']] = $file_value;
+                    break;
+                default:
+                    $values = $postValues;
+                    break;
+            }
+            $setter = "set_" . $oneFormField['name'];
+            $setter = $this->camelize($setter);
+            
+            if($oneFormField['type']=='boolean'){
+                if(!isset($values[$oneFormField['name']]) || $values[$oneFormField['name']]==null || $values[$oneFormField['name']]==false || $values[$oneFormField['name']]==0 || $values[$oneFormField['name']]=="false")
+                    $values[$oneFormField['name']] = 0;
+                else 
+                    $values[$oneFormField['name']] = 1;
+                
+            }
+            
+            $obj->$setter($values[$oneFormField['name']]);
+        }
+        
+        
+        $obj->setUpdatedAt(mktime(date('H'), date('i'), date('s'), date('m'), date('d'), date('Y')));
+        
+        if($dao->save($obj))
+            return true;
+        
+        return false;
+    }
+    
 
 }

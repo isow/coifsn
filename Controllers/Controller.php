@@ -41,6 +41,14 @@ class Controller {
         $this->content .= $output;
     }
 
+    /**
+     * Remplace le bloc 'content' par le contenu du fichier
+     * le scope est inclu donc $this est pris en compte
+     * 
+     * @return $this->content (interprété)
+     * @global type $scope
+     * @param type $file 
+     */
     public function replaceContentFile($file) {
         ob_start();
         global $scope;
@@ -104,6 +112,11 @@ class Controller {
         //return $this->content;
     }
 
+    /**
+     * Construit la page ...
+     * 
+     * @return type 
+     */
     public function toHtml() {
         $this->headConctruct();
         $this->contentConstruct();
@@ -128,7 +141,9 @@ class Controller {
         $this->template .= '<div class="container" id="container">';
         $this->template .= '<div class="row">';
         $this->template .= '<div id="content" class="span12">';
-        $this->template .= $this->content;
+            $this->template .= '<div id="subcontent" class="subcontent">';
+                $this->template .= $this->content;
+            $this->template .= '</div>'; //fin subcontent
         $this->template .= '</div>'; //fin content
         $this->template .= '</div>'; //fin row
         $this->template .= '</div>'; //fin container

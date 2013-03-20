@@ -13,5 +13,14 @@ namespace coiffuresenegal\Dao;
  */
 class VilleDao extends VilleDaoBase
 {
-
+    /**
+     * 
+     * @param type $offset
+     * @param type $limit
+     * @param type $orderbyBag
+     * @return type
+     */
+    public function getVilleWithPager($offset = null, $limit = null, $orderbyBag = null) {
+    	return $this->getVilleListByFilter($orderbyBag, $offset, $limit);
+    }
 }

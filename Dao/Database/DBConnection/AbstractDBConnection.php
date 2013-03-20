@@ -106,6 +106,7 @@ abstract class AbstractDBConnection implements ConnectionSettingsInterface, Conn
 		if ($this->dbh == null) {
 			$this->connect();
 		}
+                error_log($query);
 
 		$res = $this->dbh->exec($query);
 		return $res;
@@ -214,11 +215,12 @@ abstract class AbstractDBConnection implements ConnectionSettingsInterface, Conn
 		if ($this->dbh == null) {
 			$this->connect();
 		}
+                
 		if ($in === null) {
 			return 'NULL';
 		}
 		
-		return $this->dbh->quote($in);
+                return $this->dbh->quote($in);
 	}
 
 	/**
@@ -595,6 +597,7 @@ abstract class AbstractDBConnection implements ConnectionSettingsInterface, Conn
 		foreach ($table_info as $columnArray) {
 			if ($columnArray['column_name'] == $column) {
 				if (isset($columnArray['data_type'])) {
+                                        error_log($columnArray['data_type']);
 					return $columnArray['data_type']; 
 				} else {
 					error_log("Invalid column? ".var_export($columnArray, true));

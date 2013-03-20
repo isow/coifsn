@@ -13,7 +13,7 @@ class SuperAdminRootController extends Controller {
     public function __construct() {
         $this->menu_array = array(
             'Régions' => 'region',
-            'Villes' => 'town',
+            'Villes' => 'ville',
             'Salons' => 'salon',
             'Utilisateurs' => 'user',
             'Modèles article' => 'article-model',
@@ -29,8 +29,13 @@ class SuperAdminRootController extends Controller {
             $page = $_GET['p'];
             switch ($page) {
                 case "region":
-                    //Page RÃ©gion
+                    //Page Region
                     $pageController = new SuperAdminRegionController();
+                    break;
+                
+                case "ville":
+                    //Page Ville
+                    $pageController = new SuperAdminVilleController();
                     break;
 
                 default:

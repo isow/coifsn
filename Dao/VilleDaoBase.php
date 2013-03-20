@@ -17,9 +17,9 @@ use Database\TDBM\TDBMService;
 class VilleDaoBase extends DaoCommon implements DAOInterface {
 
     public $tableName = "ville";
-    public $tablePrimaryKey = "ID_ville";
+    public $tablePrimaryKey = "id_ville";
     public $tableColumns = array(
-        'ID_ville',
+        'id_ville',
         'id_region',
         'nom_ville',
         'image',

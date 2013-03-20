@@ -46,7 +46,7 @@ class MySqlConnection extends AbstractDBConnection implements ConnectionInterfac
 	 * @Property
 	 * @var string
 	 */
-	public $password = "bibs";
+	public $password = "root";
         
         /**
 	 * The database ...
@@ -712,6 +712,29 @@ class MySqlConnection extends AbstractDBConnection implements ConnectionInterfac
 			$this->dbh->exec("SET NAMES utf8;");
 		}
 	}
+        
+        
+        public function quoteSmart($in) {
+            /*switch ($type) {
+                case ($type=='tinyint' || $type=='int' || $type=='decimal' || $type=='integer' || $type=='boolean' || $type=='float'):
+                    //$formattedValue = $value;
+                    error_log("IN = " . $in);
+                    error_log("YEAH IN = " . $this->dbh->$in);
+                    return $this->dbh->$in;
+                    break;
+                case ($type==null):
+                    error_log("IN = " . $in);
+                    error_log("YEAH IN = " . $this->dbh->quote($in));
+                    return $this->dbh->quote($in);
+                default:
+                    error_log("IN = " . $in);
+                    error_log("YEAH IN = " . $this->dbh->quote($in));
+                    return $this->dbh->quote($in);
+                    break;
+            }*/
+            
+            return $this->dbh->quote($in);
+        }
 	
 }
 

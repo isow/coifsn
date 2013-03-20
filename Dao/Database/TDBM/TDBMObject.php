@@ -333,6 +333,7 @@ class TDBMObject implements \ArrayAccess, \Iterator {
 
 		/*if ($var == $this->getPrimaryKey() && isset($this->db_row[$var]))
 			throw new TDBMException("Error! Changing primary key value is forbidden.");*/
+                
 		$this->db_row[$var] = $value;
 		if ($this->db_modified_state == false) {
 			$this->db_modified_state = true;
@@ -381,6 +382,15 @@ class TDBMObject implements \ArrayAccess, \Iterator {
 			foreach ($this->db_row as $key=>$value) {
 				if (!$first)
 				$sql .= ',';
+                                
+                                // Ok, let's start by checking the column type
+                                $type = $this->db_connection->getColumnType($this->db_table_name, $key);
+
+                                // Throws an exception if the type is not ok.
+                                if (!$this->db_connection->checkType($value, $type)) {
+                                        throw new TDBMException("Error! Invalid value passed for attribute '$var' of table '$this->db_table_name'. Passed '$value', but expecting '$type'");
+                                }
+                                
 				$sql .= $this->db_connection->quoteSmart($value);
 				$first=false;
 			}
@@ -466,7 +476,16 @@ class TDBMObject implements \ArrayAccess, \Iterator {
 			foreach ($this->db_row as $key=>$value) {
 				if (!$first)
 				$sql .= ',';
-				$sql .= $this->db_connection->escapeDBItem($key)." = ".$this->db_connection->quoteSmart($value);
+                                
+                                // Ok, let's start by checking the column type
+                                $type = $this->db_connection->getColumnType($this->db_table_name, $key);
+
+                                // Throws an exception if the type is not ok.
+                                if (!$this->db_connection->checkType($value, $type)) {
+                                        throw new TDBMException("Error! Invalid value passed for attribute '$var' of table '$this->db_table_name'. Passed '$value', but expecting '$type'");
+                                }
+                                
+				$sql .= $this->db_connection->escapeDBItem($key)." = ".$this->db_connection->quoteSmart($value, $type);
 				$first=false;
 			}
 			$sql .= ' WHERE '.$sql_where/*$primary_key."='".$this->db_row[$primary_key]."'"*/;

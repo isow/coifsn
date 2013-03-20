@@ -2,8 +2,8 @@
 
 namespace coiffuresenegal\Controllers;
 
-use coiffuresenegal\Form\RegionForm;
-use coiffuresenegal\Dao\RegionDao;
+use coiffuresenegal\Form\VilleForm;
+use coiffuresenegal\Dao\VilleDao;
 use EvoluGrid\EvoluGrid;
 use EvoluGrid\EvoluColumn;
 
@@ -13,16 +13,16 @@ use EvoluGrid\EvoluColumn;
  * @author Ibrahima SOW
  * @Component
  */
-class SuperAdminRegionController extends Controller {
+class SuperAdminVilleController extends Controller {
 
-    public $regionForm;
+    public $villeForm;
     public $action;
-    public $regionId = null;
+    public $villeId = null;
     
     /**
-     * @var RegionDao
+     * @var VilleDao
      */
-    public $regionDao;
+    public $villeDao;
     
     public function __construct() {
         $this->menu_array = array(
@@ -42,11 +42,11 @@ class SuperAdminRegionController extends Controller {
         
         
         if(isset($_GET['id']) && $_GET['id']!="") {
-            $this->regionId = $_GET['id'];
+            $this->villeId = $_GET['id'];
         }
         
         
-        $this->regionDao = new RegionDao();
+        $this->villeDao = new VilleDao();
     }
     /**
      * Page displayed when a user arrives on your web application.
@@ -56,38 +56,38 @@ class SuperAdminRegionController extends Controller {
         error_log($this->action);
         switch($this->action) {
             case 'get':
-                    $this->regionListRender();
+                    $this->villeListRender();
                 break;
             case 'edit':
-                    $this->regionEdit($this->regionId);
+                    $this->villeEdit($this->villeId);
                 break;
             case 'save':
-                    $this->regionSave($this->regionId);
+                    $this->villeSave($this->villeId);
                 break;
             case 'delete':
-                    $this->regionDelete($this->regionId);
+                    $this->villeDelete($this->villeId);
                 break;
             default:
                     error_log("ICI C'EST PARIS!!");
-                    $this->replaceContentFile("../View/SuperAdmin/Region/indexRegion.php");
+                    $this->replaceContentFile("../View/SuperAdmin/Ville/indexVille.php");
                     return $this->toHtml();
                 break;
         }
     }
     
     
-    public function regionListRender() {
+    public function villeListRender() {
         $output = 'json';
         $evoluGrid = new EvoluGrid();
         
-        $rows = $this->regionDao->getRegionWithPager();
+        $rows = $this->villeDao->getVilleWithPager();
         
         foreach ($rows as $row) {
             $obj = array();
             
             /*
-             *  'id_region',
-                'nom_region',
+             *  'id_ville',
+                'nom_ville',
                 'image',
                 'banniere',
                 'notice',
@@ -98,41 +98,41 @@ class SuperAdminRegionController extends Controller {
                 'created_at',
                 'updated_at'
              */
-            $obj['id'] = $row->id_region;
-            $obj['name'] = $row->nom_region;
-            $obj['image'] = "<img src='/images/regions/" . $row->image . "' alt='" .$row->nom_region. "' title='" .$row->nom_region. "' class='listImage' />";
+            $obj['id'] = $row->id_ville;
+            $obj['name'] = $row->nom_ville;
+            $obj['image'] = "<img src='/images/villes/" . $row->image . "' alt='" .$row->nom_ville. "' title='" .$row->nom_ville. "' class='listImage' />";
 
             $evoluGrid->addRow($obj);
         }
         $checkColumn = new EvoluColumn('');
-        $checkColumn->jsrenderer = 'function(row) { return "<input class=\'selectRegion\' type=\'checkbox\' name=\'" + row["id"] + "\' value=\'" + row["id"] + "\'>" }';
+        $checkColumn->jsrenderer = 'function(row) { return "<input class=\'selectVille\' type=\'checkbox\' name=\'" + row["id"] + "\' value=\'" + row["id"] + "\'>" }';
 
         $evoluGrid->addColumn($checkColumn);
 
 
         $evoluGrid->addColumn(new EvoluColumn("", "image"));
-        $evoluGrid->addColumn(new EvoluColumn("R&eacute;gion", "name"));
+        $evoluGrid->addColumn(new EvoluColumn("Ville", "name"));
         
         $editColumn = new EvoluColumn('');
-        $editColumn->jsrenderer = 'function(row) { return $("<a/>").css({"padding-left": "250px", "text-align" : "right"}).html($("<i/>").css({"margin-right":"0px", "float":"right"}).attr({"class":"icon-edit", "title":"Modifier"}, {"title":"Supprimer"})).attr("href", "region/edit/" + row[\'id\']) }';
+        $editColumn->jsrenderer = 'function(row) { return $("<a/>").css({"padding-left": "250px", "text-align" : "right"}).html($("<i/>").css({"margin-right":"0px", "float":"right"}).attr({"class":"icon-edit", "title":"Modifier"}, {"title":"Supprimer"})).attr("href", "ville/edit/" + row[\'id\']) }';
 
         $evoluGrid->addColumn($editColumn);
         
         
         $deleteColumn = new EvoluColumn('');
-        $deleteColumn->jsrenderer = 'function(row) { return $("<a/>").css({"text-align" : "right"}).html($("<i/>").css({"margin-right":"30px", "float":"right"}).attr({"class":"icon-remove", "title":"Supprimer"})).attr("href", "region/delete/" + row[\'id\']) }';
+        $deleteColumn->jsrenderer = 'function(row) { return $("<a/>").css({"text-align" : "right"}).html($("<i/>").css({"margin-right":"30px", "float":"right"}).attr({"class":"icon-remove", "title":"Supprimer"})).attr("href", "ville/delete/" + row[\'id\']) }';
 
         $evoluGrid->addColumn($deleteColumn);
         
 
         $evoluGrid->setTotalRowsCount(1);
 
-        $filename = "regions.csv";
+        $filename = "villes.csv";
 
         $evoluGrid->output($output, $filename);
     }
     
-    public function regionEdit($regionId = null) {
+    public function villeEdit($villeId = null) {
         $this->menu_array = array(
             'Régions' => '../../region',
             'Villes' => '../../ville',
@@ -142,51 +142,51 @@ class SuperAdminRegionController extends Controller {
             'Articles' => '../../article'
         );
         
-        if($regionId===null)
+        if($villeId===null)
             $actionUrl = "save";
         else
-            $actionUrl = "../save/" . $regionId;
+            $actionUrl = "../save/" . $villeId;
         
-        $this->regionForm = new RegionForm($regionId, "region_edit_form", "POST", $actionUrl, null, $idArray = null);
+        $this->villeForm = new VilleForm($villeId, "ville_edit_form", "POST", $actionUrl, null, $idArray = null);
         
-        $this->replaceContentFile("../View/SuperAdmin/Region/editRegion.php");
+        $this->replaceContentFile("../View/SuperAdmin/Ville/editVille.php");
         echo $this->toHtml();
     }
     
     
-    public function regionDelete($regionId) {
-        $obj = $this->regionDao->getById($regionId);
+    public function villeDelete($villeId) {
+        $obj = $this->villeDao->getById($villeId);
         
-        if($obj && $this->regionDao->deleteRegion($obj)) {
+        if($obj && $this->villeDao->deleteVille($obj)) {
             error_log("DELETED");
             $this->action = "index";
-            echo '<script type="text/javascript">document.location.href="/superadmin/region";</script>';
+            echo '<script type="text/javascript">document.location.href="/superadmin/ville";</script>';
             echo $this->render();
         } else {
             error_log("NOT DELETED");
             $this->action = "index";
-            echo '<script type="text/javascript">document.location.href="/superadmin/region";</script>';
+            echo '<script type="text/javascript">document.location.href="/superadmin/ville";</script>';
             echo $this->render();
         }
     }
     
-    public function regionSave($regionId = null) {        
-        if($regionId==null)
+    public function villeSave($villeId = null) {        
+        if($villeId==null)
             $actionUrl = "save";
         else
-            $actionUrl = "../save/" . $regionId;
+            $actionUrl = "../save/" . $villeId;
         
-        $this->regionForm = new RegionForm($regionId, "region_edit_form", "POST", $actionUrl, null, $idArray = null);
+        $this->villeForm = new VilleForm($villeId, "ville_edit_form", "POST", $actionUrl, null, $idArray = null);
         
-        if($this->regionForm->saveRegion($_POST, $_FILES)) {
+        if($this->villeForm->saveVille($_POST, $_FILES)) {
             error_log("SAVED");
             $this->action = "index";
-            echo '<script type="text/javascript">document.location.href="/superadmin/region";</script>';
+            echo '<script type="text/javascript">document.location.href="/superadmin/ville";</script>';
             echo $this->render();
         } else {
             error_log("NOT SAVED");
             $this->action = "index";
-            echo '<script type="text/javascript">document.location.href="/superadmin/region";</script>';
+            echo '<script type="text/javascript">document.location.href="/superadmin/ville";</script>';
             echo $this->render();
         }
     }

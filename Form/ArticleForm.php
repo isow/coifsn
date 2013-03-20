@@ -124,11 +124,11 @@ class ArticleForm extends Form {
             $this->formFields = array(
                 array("type" => "select", "name" => "id_modele", "value" => $modeleArticleSelectList, "label" => "Modèle d'article"),
                 array("type" => "select", "name" => "id_salon", "value" => $salonSelectList, "label" => "Salon"),
-                array("type" => "text", "name" => "titre_article", "value" => "", "label" => "Titre"),
-                array("type" => "file", "name" => "image", "value" => "", "label" => "Image"),
-                array("type" => "textarea", "name" => "notice", "value" => "", "label" => "Résumé"),
-                array("type" => "boolean", "name" => "actif", "value" => "true", "label" => "Publier ?"),
-                array("type" => "boolean", "name" => "article_une", "value" => "true", "label" => "Une ?")
+                array("type" => "text", "name" => "titre_article", "value" => $this->articleObject->getTitreArticle(), "label" => "Titre"),
+                array("type" => "file", "name" => "image", "value" => $this->articleObject->getImage(), "label" => "Image"),
+                array("type" => "textarea", "name" => "notice", "value" => $this->articleObject->getNotice(), "label" => "Résumé"),
+                array("type" => "boolean", "name" => "actif", "value" => $this->articleObject->getActif(), "label" => "Publier ?"),
+                array("type" => "boolean", "name" => "article_une", "value" => $this->articleObject->getArticleUne(), "label" => "Une ?")
             );
         }
     }
